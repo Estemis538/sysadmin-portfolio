@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" id="meta-desc" content="Estemis — Aspiring System Administrator. Exploring Linux systems, server infrastructure, networking and automation." />
+  <title>Estemis — System Administrator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg-base:#0c0d0f;--bg-surface:#111317;--bg-elevated:#181b20;--bg-card:#161a1f;--border:rgba(255,255,255,0.07);--border-subtle:rgba(255,255,255,0.04);--text-primary:#e8e9eb;--text-secondary:#8a8f9a;--text-muted:#4f545e;--accent:#7fab6e;--accent-dim:#5a7c50;--accent-glow:rgba(127,171,110,0.12);--accent-glow-s:rgba(127,171,110,0.06);--radius-sm:6px;--radius-md:12px;--radius-lg:20px;--tr:0.35s cubic-bezier(0.4,0,0.2,1);--tr-fast:0.18s cubic-bezier(0.4,0,0.2,1);--font-sans:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--accent-dim) var(--bg-surface)}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-surface)}::-webkit-scrollbar-thumb{background:var(--accent-dim);border-radius:3px}
+    body{font-family:var(--font-sans);background:var(--bg-base);color:var(--text-primary);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border-subtle) 1px,transparent 1px),linear-gradient(90deg,var(--border-subtle) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+    /* NAV */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 48px;height:68px;display:flex;align-items:center;justify-content:space-between;transition:background var(--tr),border-color var(--tr)}
+    .nav.scrolled{background:rgba(12,13,15,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
+    .nav-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse-dot 2.4s ease-in-out infinite}
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+    .nav-links{display:flex;gap:32px;list-style:none}
+    .nav-links a{font-size:13px;font-weight:500;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase;position:relative;transition:color var(--tr-fast)}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform var(--tr-fast)}
+    .nav-links a:hover,.nav-links a.active{color:var(--text-primary)}
+    .nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .lang-switcher{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.06em}
+    .lang-btn{padding:7px 11px;color:var(--text-muted);background:transparent;transition:color var(--tr-fast),background var(--tr-fast);cursor:pointer;border:none}
+    .lang-btn+.lang-btn{border-left:1px solid var(--border)}
+    .lang-btn.active{background:var(--accent-glow);color:var(--accent)}
+    .lang-btn:hover:not(.active){color:var(--text-secondary);background:rgba(255,255,255,.03)}
+    .nav-cta{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text-secondary);border:1px solid var(--border);padding:8px 16px;border-radius:var(--radius-sm);transition:color var(--tr-fast),border-color var(--tr-fast),background var(--tr-fast)}
+    .nav-cta:hover{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-glow-s)}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;width:28px;cursor:pointer;z-index:101}
+    .nav-hamburger span{display:block;height:1.5px;background:var(--text-primary);border-radius:2px;transition:transform var(--tr),opacity var(--tr),width var(--tr)}
+    .nav-hamburger span:nth-child(2){width:70%}
+    .nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+    .nav-hamburger.open span:nth-child(2){opacity:0;transform:translateX(-8px)}
+    .nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+    .nav-mobile{display:none;position:fixed;inset:0;background:rgba(12,13,15,.97);backdrop-filter:blur(20px);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px;opacity:0;pointer-events:none;transition:opacity var(--tr)}
+    .nav-mobile.open{opacity:1;pointer-events:all}
+    .nav-mobile a{font-size:26px;font-weight:600;color:var(--text-secondary);transition:color var(--tr-fast)}
+    .nav-mobile a:hover{color:var(--accent)}
+    .mobile-lang{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-top:8px}
+    .mobile-lang .lang-btn{font-size:14px;padding:10px 20px}
+
+    /* HELPERS */
+    section{position:relative;z-index:1}
+    .container{max-width:1200px;margin:0 auto;padding:0 48px}
+    .section-label{font-family:var(--font-mono);font-size:11px;font-weight:400;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+    .section-label::before{content:'';display:block;width:24px;height:1px;background:var(--accent)}
+    .section-divider{border:none;border-top:1px solid var(--border-subtle);margin:0}
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* HERO */
+    #hero{min-height:100vh;display:flex;align-items:center;padding-top:68px}
+    .hero-container{max-width:1200px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;width:100%}
+    .hero-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-secondary);border:1px solid var(--border);padding:6px 14px;border-radius:100px;margin-bottom:36px;background:var(--bg-surface);opacity:0;animation:fadeSlideUp .8s .2s cubic-bezier(.4,0,.2,1) forwards}
+    .hero-status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse-dot 2.4s ease-in-out infinite}
+    .hero-name{font-size:clamp(52px,7vw,88px);font-weight:700;line-height:1;letter-spacing:-.025em;margin-bottom:10px;opacity:0;animation:fadeSlideUp .9s .4s cubic-bezier(.4,0,.2,1) forwards}
+    .hero-name-accent{color:var(--accent)}
+    .hero-title{font-size:clamp(13px,1.5vw,17px);font-weight:400;color:var(--text-secondary);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:28px;opacity:0;animation:fadeSlideUp .9s .55s cubic-bezier(.4,0,.2,1) forwards}
+    .hero-desc{font-size:16px;line-height:1.75;color:var(--text-secondary);max-width:440px;margin-bottom:44px;opacity:0;animation:fadeSlideUp .9s .7s cubic-bezier(.4,0,.2,1) forwards}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeSlideUp .9s .85s cubic-bezier(.4,0,.2,1) forwards}
+    @keyframes fadeSlideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .btn-primary{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--accent);color:#0c0d0f;font-size:14px;font-weight:600;border-radius:var(--radius-sm);transition:background var(--tr-fast),transform var(--tr-fast),box-shadow var(--tr-fast)}
+    .btn-primary:hover{background:#8fbe7c;transform:translateY(-2px);box-shadow:0 8px 24px rgba(127,171,110,.25)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-secondary{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:transparent;color:var(--text-primary);font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:1px solid var(--border);transition:border-color var(--tr-fast),background var(--tr-fast),transform var(--tr-fast)}
+    .btn-secondary:hover{border-color:var(--accent-dim);background:var(--accent-glow-s);transform:translateY(-2px)}
+    .btn-secondary:active{transform:translateY(0)}
+    .hero-visual{display:flex;align-items:center;justify-content:center;opacity:0;animation:fadeIn 1.2s 1s cubic-bezier(.4,0,.2,1) forwards}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    #infra-canvas{width:100%;max-width:520px;aspect-ratio:1/1;border-radius:var(--radius-lg);cursor:default}
+
+    /* ABOUT */
+    #about{padding:140px 0 100px}
+    .about-grid{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start;margin-top:56px}
+    .about-index{position:sticky;top:100px}
+    .about-index-num{font-family:var(--font-mono);font-size:80px;font-weight:700;color:var(--border);line-height:1;letter-spacing:-.04em;margin-bottom:24px}
+    .about-tags{display:flex;flex-direction:column;gap:10px}
+    .about-tag{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+    .about-tag::before{content:'';display:block;width:16px;height:1px;background:var(--border)}
+    .about-heading{font-size:clamp(28px,3.5vw,42px);font-weight:700;line-height:1.2;letter-spacing:-.02em;margin-bottom:32px}
+    .about-heading em{font-style:normal;color:var(--accent)}
+    .about-body{font-size:17px;line-height:1.85;color:var(--text-secondary);max-width:600px}
+    .about-body p+p{margin-top:20px}
+    .about-divider{width:48px;height:1px;background:var(--border);margin:36px 0}
+    .about-facts{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+    .about-fact{padding:20px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);position:relative;overflow:hidden;transition:border-color var(--tr-fast)}
+    .about-fact::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);opacity:0;transition:opacity var(--tr)}
+    .about-fact:hover{border-color:var(--accent-dim)}
+    .about-fact:hover::before{opacity:1}
+    .about-fact-label{font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+    .about-fact-value{font-size:14px;color:var(--text-secondary)}
+
+    /* SKILLS */
+    #skills{padding:100px 0}
+    .skills-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:64px;gap:24px}
+    .skills-heading{font-size:clamp(32px,4vw,52px);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-top:16px}
+    .skills-note{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);max-width:220px;line-height:1.6;margin-top:20px}
+    .skills-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+    .skill-group{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);padding:32px;position:relative;overflow:hidden;transition:border-color var(--tr),background var(--tr)}
+    .skill-group::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--accent-glow-s),transparent 60%);opacity:0;transition:opacity var(--tr);pointer-events:none}
+    .skill-group:hover{border-color:rgba(127,171,110,.2);background:var(--bg-elevated)}
+    .skill-group:hover::after{opacity:1}
+    .skill-group-header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+    .skill-group-icon{width:36px;height:36px;border-radius:var(--radius-sm);background:var(--accent-glow);border:1px solid rgba(127,171,110,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .skill-group-icon svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .skill-group-name{font-size:15px;font-weight:600;color:var(--text-primary)}
+    .skill-group-num{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:auto}
+    .skill-tags{display:flex;flex-wrap:wrap;gap:8px}
+    .skill-tag{font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);background:var(--bg-elevated);border:1px solid var(--border);padding:5px 12px;border-radius:100px;transition:color var(--tr-fast),border-color var(--tr-fast),background var(--tr-fast);cursor:default}
+    .skill-tag:hover{color:var(--accent);border-color:rgba(127,171,110,.3);background:var(--accent-glow-s)}
+
+    /* PROJECTS */
+    #projects{padding:100px 0}
+    .projects-header{margin-bottom:64px}
+    .projects-heading{font-size:clamp(32px,4vw,52px);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-top:16px}
+    .projects-sub{font-size:15px;color:var(--text-muted);margin-top:12px;font-family:var(--font-mono)}
+    .projects-layout{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+    .project-card{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);padding:36px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:border-color var(--tr),transform var(--tr),box-shadow var(--tr);cursor:default}
+    .project-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,var(--accent-glow-s),transparent 60%);opacity:0;transition:opacity var(--tr);pointer-events:none}
+    .project-card:hover{border-color:rgba(127,171,110,.2);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(127,171,110,.08)}
+    .project-card:hover::before{opacity:1}
+    .project-card:nth-child(1){grid-column:span 7}
+    .project-card:nth-child(2){grid-column:span 5}
+    .project-card:nth-child(3){grid-column:span 4}
+    .project-card:nth-child(4){grid-column:span 4}
+    .project-card:nth-child(5){grid-column:span 4}
+    .project-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+    .project-num{font-family:var(--font-mono);font-size:11px;color:var(--text-muted)}
+    .project-status{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:100px}
+    .status-planned{color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--border-subtle)}
+    .project-icon-wrap{width:48px;height:48px;border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:var(--bg-elevated);transition:border-color var(--tr),background var(--tr)}
+    .project-card:hover .project-icon-wrap{border-color:rgba(127,171,110,.25);background:var(--accent-glow)}
+    .project-icon-wrap svg{width:22px;height:22px;stroke:var(--text-muted);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--tr)}
+    .project-card:hover .project-icon-wrap svg{stroke:var(--accent)}
+    .project-name{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:10px}
+    .project-desc{font-size:14px;color:var(--text-secondary);line-height:1.65;flex:1;margin-bottom:24px}
+    .project-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+    .project-tech-tag{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:var(--bg-base);border:1px solid var(--border-subtle);padding:3px 9px;border-radius:4px}
+    .project-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-subtle);padding-top:18px;margin-top:auto}
+    .project-link{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--text-muted);font-family:var(--font-mono);transition:color var(--tr-fast)}
+    .project-link:hover{color:var(--accent)}
+    .project-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .project-card--featured::after{content:'';position:absolute;bottom:0;right:0;width:80px;height:80px;border-top-left-radius:60px;border:1px solid var(--border-subtle);transform:translate(50%,50%);pointer-events:none;transition:border-color var(--tr)}
+    .project-card--featured:hover::after{border-color:rgba(127,171,110,.1)}
+
+    /* INTERESTS */
+    #interests{padding:80px 0}
+    .interests-inner{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:48px;background:var(--bg-surface);display:grid;grid-template-columns:1fr 2fr;gap:48px;align-items:center}
+    .interests-heading{font-size:24px;font-weight:600;letter-spacing:-.015em;margin-top:14px;margin-bottom:10px}
+    .interests-note{font-size:13px;color:var(--text-muted);line-height:1.6}
+    .interests-items{display:flex;flex-wrap:wrap;gap:12px}
+    .interest-item{display:flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-elevated);transition:border-color var(--tr-fast),background var(--tr-fast);cursor:default}
+    .interest-item:hover{border-color:rgba(127,171,110,.2);background:var(--accent-glow-s)}
+    .interest-item svg{width:16px;height:16px;stroke:var(--text-muted);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--tr-fast)}
+    .interest-item:hover svg{stroke:var(--accent)}
+    .interest-item span{font-size:14px;font-weight:500;color:var(--text-secondary);transition:color var(--tr-fast)}
+    .interest-item:hover span{color:var(--text-primary)}
+
+    /* CONTACT */
+    #contact{padding:100px 0 80px}
+    .contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-top:56px}
+    .contact-heading{font-size:clamp(32px,4vw,52px);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-top:16px;margin-bottom:20px}
+    .contact-desc{font-size:15px;color:var(--text-secondary);line-height:1.75;max-width:400px;margin-bottom:44px}
+    .contact-links{display:flex;flex-direction:column;gap:16px}
+    .contact-link-card{display:flex;align-items:center;gap:18px;padding:22px 24px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);transition:border-color var(--tr),transform var(--tr),background var(--tr);position:relative;overflow:hidden;cursor:pointer}
+    .contact-link-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:bottom;transition:transform var(--tr)}
+    .contact-link-card:hover{border-color:rgba(127,171,110,.2);background:var(--bg-elevated);transform:translateX(4px)}
+    .contact-link-card:hover::before{transform:scaleY(1)}
+    .contact-link-icon{width:44px;height:44px;border-radius:var(--radius-sm);background:var(--bg-elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--tr),border-color var(--tr)}
+    .contact-link-card:hover .contact-link-icon{background:var(--accent-glow);border-color:rgba(127,171,110,.2)}
+    .contact-link-icon svg{width:20px;height:20px;stroke:var(--text-muted);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--tr)}
+    .contact-link-card:hover .contact-link-icon svg{stroke:var(--accent)}
+    .contact-link-label{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+    .contact-link-value{font-size:14px;font-weight:500;color:var(--text-primary)}
+    .contact-link-action{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);transition:color var(--tr)}
+    .contact-link-card:hover .contact-link-action{color:var(--accent)}
+    .copy-toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-secondary);font-family:var(--font-mono);font-size:13px;padding:10px 20px;border-radius:100px;z-index:999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+    .copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .contact-terminal{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;font-family:var(--font-mono)}
+    .terminal-header{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border)}
+    .terminal-dot{width:10px;height:10px;border-radius:50%}
+    .terminal-dot:nth-child(1){background:#ff5f56}.terminal-dot:nth-child(2){background:#ffbd2e}.terminal-dot:nth-child(3){background:#27c93f}
+    .terminal-title{font-size:11px;color:var(--text-muted);margin-left:8px}
+    .terminal-body{padding:24px}
+    .terminal-line{font-size:13px;line-height:1.8;color:var(--text-secondary)}
+    .terminal-line .prompt{color:var(--accent)}.terminal-line .cmd{color:var(--text-primary)}.terminal-line .output{color:var(--text-muted);padding-left:16px}.terminal-line .hl{color:var(--accent)}
+    .terminal-cursor{display:inline-block;width:7px;height:14px;background:var(--accent);vertical-align:middle;animation:blink 1.1s step-end infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:36px 0;position:relative;z-index:1}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+    .footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--text-muted)}
+    .footer-logo strong{color:var(--text-secondary)}
+    .footer-copy{font-size:12px;font-family:var(--font-mono);color:var(--text-muted)}
+    .footer-line{font-size:12px;font-family:var(--font-mono);color:var(--text-muted);display:flex;align-items:center;gap:8px}
+    .footer-line span{color:var(--accent)}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){
+      .hero-container{gap:48px}
+      .about-grid{grid-template-columns:1fr;gap:40px}
+      .about-index{position:static}
+      .contact-inner{grid-template-columns:1fr;gap:48px}
+      .interests-inner{grid-template-columns:1fr;gap:32px}
+      .project-card:nth-child(1),.project-card:nth-child(2),.project-card:nth-child(3),.project-card:nth-child(4),.project-card:nth-child(5){grid-column:span 6}
+    }
+    @media(max-width:768px){
+      .nav{padding:0 24px}
+      .nav-links,.nav-cta{display:none}
+      .nav-hamburger{display:flex}
+      .nav-mobile{display:flex}
+      .lang-btn{padding:6px 9px}
+      .hero-container{grid-template-columns:1fr;gap:48px;padding:0 24px}
+      .hero-visual{order:-1}
+      #infra-canvas{max-width:300px}
+      .container{padding:0 24px}
+      .skills-header{flex-direction:column}
+      .skills-grid{grid-template-columns:1fr}
+      .projects-layout{grid-template-columns:1fr}
+      .project-card:nth-child(n){grid-column:span 1}
+      .about-facts{grid-template-columns:1fr}
+      .hero-name{font-size:44px}
+    }
+    @media(max-width:480px){
+      .hero-container,.container{padding:0 20px}
+      .contact-inner{gap:32px}
+      .footer-inner{flex-direction:column;align-items:flex-start;gap:10px}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .reveal{opacity:1;transform:none}
+      html{scroll-behavior:auto}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <a href="#hero" class="nav-logo"><span class="nav-logo-dot"></span>estemis</a>
+  <ul class="nav-links">
+    <li><a href="#about"    data-section="about"    data-i18n="nav.about">About</a></li>
+    <li><a href="#skills"   data-section="skills"   data-i18n="nav.skills">Skills</a></li>
+    <li><a href="#projects" data-section="projects" data-i18n="nav.projects">Projects</a></li>
+    <li><a href="#contact"  data-section="contact"  data-i18n="nav.contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-switcher" role="group">
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn"        id="btn-ru" onclick="setLang('ru')">RU</button>
+    </div>
+    <a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="nav-cta">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+      GitHub
+    </a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="nav-mobile" id="mobile-menu">
+  <a href="#about"    class="mobile-link" data-i18n="nav.about">About</a>
+  <a href="#skills"   class="mobile-link" data-i18n="nav.skills">Skills</a>
+  <a href="#projects" class="mobile-link" data-i18n="nav.projects">Projects</a>
+  <a href="#contact"  class="mobile-link" data-i18n="nav.contact">Contact</a>
+  <a href="https://github.com/Estemis538" target="_blank" rel="noopener">GitHub ↗</a>
+  <div class="mobile-lang">
+    <button class="lang-btn active" id="btn-en-m" onclick="setLang('en')">EN</button>
+    <button class="lang-btn"        id="btn-ru-m" onclick="setLang('ru')">RU</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-container">
+    <div class="hero-left">
+      <div class="hero-status">
+        <span class="hero-status-dot"></span>
+        <span data-i18n="hero.status">Currently learning &amp; building</span>
+      </div>
+      <h1 class="hero-name">Estemis<span class="hero-name-accent">.</span></h1>
+      <p class="hero-title" data-i18n="hero.title">Aspiring System Administrator</p>
+      <p class="hero-desc" data-i18n="hero.desc">Exploring Linux systems, server infrastructure, networking and automation.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          GitHub
+        </a>
+        <a href="#projects" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span data-i18n="hero.btn_projects">Explore Projects</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <canvas id="infra-canvas"></canvas>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-index reveal">
+        <div class="about-index-num">01</div>
+        <div class="about-tags">
+          <span class="about-tag" data-i18n="about.tag1">Linux Enthusiast</span>
+          <span class="about-tag" data-i18n="about.tag2">Infrastructure</span>
+          <span class="about-tag" data-i18n="about.tag3">Networking</span>
+          <span class="about-tag" data-i18n="about.tag4">Automation</span>
+        </div>
+      </div>
+      <div class="about-content">
+        <div class="section-label reveal" data-i18n="about.label">About Me</div>
+        <h2 class="about-heading reveal" id="about-heading" style="transition-delay:.1s" data-i18n-html="about.heading">Interested in systems<br>from the <em>ground up</em></h2>
+        <div class="about-body reveal" style="transition-delay:.2s">
+          <p data-i18n="about.p1">I'm interested in understanding how computer systems work beneath the surface — from Linux internals and networking to server infrastructure and automation.</p>
+          <p data-i18n="about.p2">I enjoy experimenting, building my own lab environments and learning by solving practical problems.</p>
+        </div>
+        <div class="about-divider reveal" style="transition-delay:.25s"></div>
+        <div class="about-facts reveal" style="transition-delay:.3s">
+          <div class="about-fact"><div class="about-fact-label" data-i18n="about.f1l">Focus</div><div class="about-fact-value" data-i18n="about.f1v">Linux &amp; Server Administration</div></div>
+          <div class="about-fact"><div class="about-fact-label" data-i18n="about.f2l">Approach</div><div class="about-fact-value" data-i18n="about.f2v">Hands-on lab environments</div></div>
+          <div class="about-fact"><div class="about-fact-label" data-i18n="about.f3l">Learning Style</div><div class="about-fact-value" data-i18n="about.f3v">Build, break, understand</div></div>
+          <div class="about-fact"><div class="about-fact-label" data-i18n="about.f4l">Status</div><div class="about-fact-value" data-i18n="about.f4v">Actively developing skills</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="skills-header">
+      <div>
+        <div class="section-label reveal" data-i18n="skills.label">Technical Skills</div>
+        <h2 class="skills-heading reveal" style="transition-delay:.1s" data-i18n-html="skills.heading">Core<br>competencies</h2>
+      </div>
+      <p class="skills-note reveal" style="transition-delay:.2s" data-i18n="skills.note">A snapshot of the technologies and tools I work with and study. No synthetic ratings — just the real stack.</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group reveal" style="transition-delay:.1s">
+        <div class="skill-group-header">
+          <div class="skill-group-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <span class="skill-group-name" data-i18n="skills.g1">Operating Systems</span>
+          <span class="skill-group-num">01</span>
+        </div>
+        <div class="skill-tags"><span class="skill-tag">Linux</span><span class="skill-tag">Linux CLI</span></div>
+      </div>
+      <div class="skill-group reveal" style="transition-delay:.2s">
+        <div class="skill-group-header">
+          <div class="skill-group-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="6" y1="6" x2="10" y2="11"/><line x1="18" y1="6" x2="14" y2="11"/><line x1="6" y1="18" x2="10" y2="13"/><line x1="18" y1="18" x2="14" y2="13"/></svg></div>
+          <span class="skill-group-name" data-i18n="skills.g2">Networking</span>
+          <span class="skill-group-num">02</span>
+        </div>
+        <div class="skill-tags"><span class="skill-tag">TCP/IP</span><span class="skill-tag">IPv4</span><span class="skill-tag">Subnetting</span><span class="skill-tag">Routing</span><span class="skill-tag">Switching</span><span class="skill-tag">DNS</span><span class="skill-tag">ARP</span><span class="skill-tag">Wireshark</span></div>
+      </div>
+      <div class="skill-group reveal" style="transition-delay:.3s">
+        <div class="skill-group-header">
+          <div class="skill-group-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+          <span class="skill-group-name" data-i18n="skills.g3">System Administration</span>
+          <span class="skill-group-num">03</span>
+        </div>
+        <div class="skill-tags"><span class="skill-tag">SSH</span><span class="skill-tag">Nginx</span><span class="skill-tag">Bash Scripting</span><span class="skill-tag">Git</span><span class="skill-tag">Linux Services</span></div>
+      </div>
+      <div class="skill-group reveal" style="transition-delay:.4s">
+        <div class="skill-group-header">
+          <div class="skill-group-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+          <span class="skill-group-name" data-i18n="skills.g4">Tools</span>
+          <span class="skill-group-num">04</span>
+        </div>
+        <div class="skill-tags"><span class="skill-tag">Git</span><span class="skill-tag">Wireshark</span><span class="skill-tag">VirtualBox</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="projects-header">
+      <div class="section-label reveal" data-i18n="proj.label">Projects &amp; Homelab</div>
+      <h2 class="projects-heading reveal" style="transition-delay:.1s" data-i18n-html="proj.heading">What I'm<br>building</h2>
+      <p class="projects-sub reveal" style="transition-delay:.15s" data-i18n="proj.sub">// hands-on lab work &amp; personal infrastructure projects</p>
+    </div>
+    <div class="projects-layout">
+
+      <article class="project-card project-card--featured reveal" style="transition-delay:.1s">
+        <div class="project-top"><span class="project-num">#01</span><span class="project-status status-planned" data-i18n="proj.planned">Planned</span></div>
+        <div class="project-icon-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+        <h3 class="project-name" data-i18n="proj.p1n">Linux Server Setup</h3>
+        <p class="project-desc" data-i18n="proj.p1d">Installation and configuration of a Linux server environment. Building a stable foundation — filesystem hierarchy, user management, permissions, services and system monitoring.</p>
+        <div class="project-tech"><span class="project-tech-tag">Linux</span><span class="project-tech-tag">Bash</span><span class="project-tech-tag">systemd</span><span class="project-tech-tag">SSH</span></div>
+        <div class="project-footer">
+          <a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="project-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            github.com/Estemis538
+          </a>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)" data-i18n="proj.soon">Coming soon</span>
+        </div>
+      </article>
+
+      <article class="project-card reveal" style="transition-delay:.15s">
+        <div class="project-top"><span class="project-num">#02</span><span class="project-status status-planned" data-i18n="proj.planned">Planned</span></div>
+        <div class="project-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+        <h3 class="project-name" data-i18n="proj.p2n">Web Server Deployment</h3>
+        <p class="project-desc" data-i18n="proj.p2d">Deploying and configuring a website using Nginx — virtual hosts, reverse proxy and configuration management.</p>
+        <div class="project-tech"><span class="project-tech-tag">Nginx</span><span class="project-tech-tag">Linux</span><span class="project-tech-tag">DNS</span></div>
+        <div class="project-footer"><a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="project-link"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg><span data-i18n="proj.view">View project</span></a></div>
+      </article>
+
+      <article class="project-card reveal" style="transition-delay:.2s">
+        <div class="project-top"><span class="project-num">#03</span><span class="project-status status-planned" data-i18n="proj.planned">Planned</span></div>
+        <div class="project-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3 class="project-name" data-i18n="proj.p3n">SSH Server Hardening</h3>
+        <p class="project-desc" data-i18n="proj.p3d">Configuring secure remote server access — key-based auth, firewall rules and access controls.</p>
+        <div class="project-tech"><span class="project-tech-tag">SSH</span><span class="project-tech-tag">Linux</span><span class="project-tech-tag">iptables</span></div>
+        <div class="project-footer"><a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="project-link"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg><span data-i18n="proj.view">View project</span></a></div>
+      </article>
+
+      <article class="project-card reveal" style="transition-delay:.25s">
+        <div class="project-top"><span class="project-num">#04</span><span class="project-status status-planned" data-i18n="proj.planned">Planned</span></div>
+        <div class="project-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+        <h3 class="project-name" data-i18n="proj.p4n">Bash Automation</h3>
+        <p class="project-desc" data-i18n="proj.p4d">Automating routine system administration tasks with Bash scripts — backups, monitoring and maintenance.</p>
+        <div class="project-tech"><span class="project-tech-tag">Bash</span><span class="project-tech-tag">Linux</span><span class="project-tech-tag">cron</span></div>
+        <div class="project-footer"><a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="project-link"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg><span data-i18n="proj.view">View project</span></a></div>
+      </article>
+
+      <article class="project-card reveal" style="transition-delay:.3s">
+        <div class="project-top"><span class="project-num">#05</span><span class="project-status status-planned" data-i18n="proj.planned">Planned</span></div>
+        <div class="project-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h3 class="project-name" data-i18n="proj.p5n">Network Analysis</h3>
+        <p class="project-desc" data-i18n="proj.p5d">Exploring network traffic and protocols using Wireshark — packet capture, analysis and troubleshooting.</p>
+        <div class="project-tech"><span class="project-tech-tag">Wireshark</span><span class="project-tech-tag">TCP/IP</span><span class="project-tech-tag">DNS</span></div>
+        <div class="project-footer"><a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="project-link"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg><span data-i18n="proj.view">View project</span></a></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- INTERESTS -->
+<section id="interests">
+  <div class="container">
+    <div class="interests-inner reveal">
+      <div>
+        <div class="section-label" data-i18n="int.label">Also exploring</div>
+        <h2 class="interests-heading" data-i18n="int.heading">Additional interests</h2>
+        <p class="interests-note" data-i18n="int.note">Outside of core sysadmin work, I enjoy exploring lower-level programming and creative side projects.</p>
+      </div>
+      <div class="interests-items">
+        <div class="interest-item"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg><span data-i18n="int.c">C Programming</span></div>
+        <div class="interest-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Lua</span></div>
+        <div class="interest-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg><span data-i18n="int.gd">Game Development</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label reveal" data-i18n="con.label">Contact</div>
+    <div class="contact-inner">
+      <div class="reveal" style="transition-delay:.1s">
+        <h2 class="contact-heading" data-i18n-html="con.heading">Let's<br>Connect</h2>
+        <p class="contact-desc" data-i18n="con.desc">I'm open to conversations about Linux, infrastructure, networking and anything systems-related. Feel free to reach out.</p>
+        <div class="contact-links">
+          <a href="https://github.com/Estemis538" target="_blank" rel="noopener" class="contact-link-card">
+            <div class="contact-link-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.071 1.532 1.031 1.532 1.031.892 1.529 2.341 1.088 2.91.831.091-.645.349-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.097-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.393.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg></div>
+            <div><div class="contact-link-label">GitHub</div><div class="contact-link-value">github.com/Estemis538</div></div>
+            <div class="contact-link-action" data-i18n="con.open">↗ open</div>
+          </a>
+          <div class="contact-link-card" role="button" tabindex="0" onclick="copyEmail()" onkeydown="if(event.key==='Enter'||event.key===' ')copyEmail()">
+            <div class="contact-link-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div><div class="contact-link-label">Email</div><div class="contact-link-value">eskamarket3@gmail.com</div></div>
+            <div class="contact-link-action" id="copy-action" data-i18n="con.copy">copy ↗</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal" style="transition-delay:.25s" aria-hidden="true">
+        <div class="contact-terminal">
+          <div class="terminal-header"><div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div><span class="terminal-title">estemis@server:~</span></div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="prompt">$ </span><span class="cmd">whoami</span></div>
+            <div class="terminal-line output">estemis</div>
+            <div class="terminal-line" style="margin-top:12px"><span class="prompt">$ </span><span class="cmd">cat /etc/hostname</span></div>
+            <div class="terminal-line output">homelab-server</div>
+            <div class="terminal-line" style="margin-top:12px"><span class="prompt">$ </span><span class="cmd">uname -r</span></div>
+            <div class="terminal-line output">6.1.0-generic</div>
+            <div class="terminal-line" style="margin-top:12px"><span class="prompt">$ </span><span class="cmd">echo "<span id="term-msg">Open to connect</span>"</span></div>
+            <div class="terminal-line output hl" id="term-out">Open to connect</div>
+            <div class="terminal-line" style="margin-top:12px"><span class="prompt">$ </span><span class="terminal-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo"><strong>Estemis</strong> — <span data-i18n="foot.role">System Administrator</span></div>
+      <div class="footer-line"><span data-i18n="foot.built">Built with</span> <span>&#9825;</span> &amp; Vanilla JS</div>
+      <div class="footer-copy">&copy; <span id="footer-year"></span> Estemis. <span data-i18n="foot.rights">All rights reserved.</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="copy-toast" id="copy-toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ═══════════ TRANSLATIONS ═══════════ */
+var T = {
+  en: {
+    'nav.about':'About','nav.skills':'Skills','nav.projects':'Projects','nav.contact':'Contact',
+    'hero.status':'Currently learning & building',
+    'hero.title':'Aspiring System Administrator',
+    'hero.desc':'Exploring Linux systems, server infrastructure, networking and automation.',
+    'hero.btn_projects':'Explore Projects',
+    'about.label':'About Me',
+    'about.heading':'Interested in systems<br>from the <em>ground up</em>',
+    'about.tag1':'Linux Enthusiast','about.tag2':'Infrastructure','about.tag3':'Networking','about.tag4':'Automation',
+    'about.p1':"I'm interested in understanding how computer systems work beneath the surface — from Linux internals and networking to server infrastructure and automation.",
+    'about.p2':'I enjoy experimenting, building my own lab environments and learning by solving practical problems.',
+    'about.f1l':'Focus','about.f1v':'Linux & Server Administration',
+    'about.f2l':'Approach','about.f2v':'Hands-on lab environments',
+    'about.f3l':'Learning Style','about.f3v':'Build, break, understand',
+    'about.f4l':'Status','about.f4v':'Actively developing skills',
+    'skills.label':'Technical Skills',
+    'skills.heading':'Core<br>competencies',
+    'skills.note':'A snapshot of the technologies and tools I work with and study. No synthetic ratings — just the real stack.',
+    'skills.g1':'Operating Systems','skills.g2':'Networking','skills.g3':'System Administration','skills.g4':'Tools',
+    'proj.label':'Projects & Homelab',
+    'proj.heading':"What I'm<br>building",
+    'proj.sub':'// hands-on lab work & personal infrastructure projects',
+    'proj.planned':'Planned','proj.view':'View project','proj.soon':'Coming soon',
+    'proj.p1n':'Linux Server Setup',
+    'proj.p1d':'Installation and configuration of a Linux server environment. Building a stable foundation — filesystem hierarchy, user management, permissions, services and system monitoring.',
+    'proj.p2n':'Web Server Deployment',
+    'proj.p2d':'Deploying and configuring a website using Nginx — virtual hosts, reverse proxy and configuration management.',
+    'proj.p3n':'SSH Server Hardening',
+    'proj.p3d':'Configuring secure remote server access — key-based auth, firewall rules and access controls.',
+    'proj.p4n':'Bash Automation',
+    'proj.p4d':'Automating routine system administration tasks with Bash scripts — backups, monitoring and maintenance.',
+    'proj.p5n':'Network Analysis',
+    'proj.p5d':'Exploring network traffic and protocols using Wireshark — packet capture, analysis and troubleshooting.',
+    'int.label':'Also exploring','int.heading':'Additional interests',
+    'int.note':'Outside of core sysadmin work, I enjoy exploring lower-level programming and creative side projects.',
+    'int.c':'C Programming','int.gd':'Game Development',
+    'con.label':'Contact',
+    'con.heading':"Let's<br>Connect",
+    'con.desc':"I'm open to conversations about Linux, infrastructure, networking and anything systems-related. Feel free to reach out.",
+    'con.open':'↗ open','con.copy':'copy ↗','con.copied':'Email copied to clipboard ✓','con.term':'Open to connect',
+    'foot.role':'System Administrator','foot.built':'Built with','foot.rights':'All rights reserved.'
+  },
+  ru: {
+    'nav.about':'Обо мне','nav.skills':'Навыки','nav.projects':'Проекты','nav.contact':'Контакты',
+    'hero.status':'Учусь и создаю',
+    'hero.title':'Начинающий системный администратор',
+    'hero.desc':'Изучаю Linux, серверную инфраструктуру, компьютерные сети и автоматизацию.',
+    'hero.btn_projects':'Смотреть проекты',
+    'about.label':'Обо мне',
+    'about.heading':'Интересуюсь системами<br>изнутри — с <em>нуля</em>',
+    'about.tag1':'Linux-энтузиаст','about.tag2':'Инфраструктура','about.tag3':'Сети','about.tag4':'Автоматизация',
+    'about.p1':'Мне интересно понимать, как работают компьютерные системы — от внутреннего устройства Linux и сетей до серверной инфраструктуры и автоматизации.',
+    'about.p2':'Мне нравится экспериментировать, строить домашние лабораторные среды и учиться, решая практические задачи.',
+    'about.f1l':'Направление','about.f1v':'Linux и системное администрирование',
+    'about.f2l':'Подход','about.f2v':'Практика в лаб. средах',
+    'about.f3l':'Стиль обучения','about.f3v':'Строю, ломаю, разбираюсь',
+    'about.f4l':'Статус','about.f4v':'Активно развиваю навыки',
+    'skills.label':'Технические навыки',
+    'skills.heading':'Основные<br>компетенции',
+    'skills.note':'Снэпшот технологий, с которыми я работаю и которые изучаю. Без синтетических рейтингов — только реальный стек.',
+    'skills.g1':'Операционные системы','skills.g2':'Сети','skills.g3':'Системное администрирование','skills.g4':'Инструменты',
+    'proj.label':'Проекты и Homelab',
+    'proj.heading':'Что я<br>создаю',
+    'proj.sub':'// практические лаб. и личные инфраструктурные проекты',
+    'proj.planned':'Запланировано','proj.view':'Посмотреть','proj.soon':'Скоро',
+    'proj.p1n':'Настройка Linux-сервера',
+    'proj.p1d':'Установка и настройка серверной среды на Linux. Создание стабильной основы — иерархия ФС, управление пользователями, права, сервисы и мониторинг.',
+    'proj.p2n':'Развёртывание веб-сервера',
+    'proj.p2d':'Развёртывание и настройка сайта с помощью Nginx — виртуальные хосты, обратный прокси и управление конфигурацией.',
+    'proj.p3n':'Защита SSH-сервера',
+    'proj.p3d':'Настройка безопасного удалённого доступа — аутентификация по ключу, правила брандмауэра и контроль доступа.',
+    'proj.p4n':'Автоматизация на Bash',
+    'proj.p4d':'Автоматизация рутинных задач системного администрирования с помощью Bash-скриптов — резервное копирование, мониторинг и обслуживание.',
+    'proj.p5n':'Анализ сети',
+    'proj.p5d':'Изучение сетевого трафика и протоколов с помощью Wireshark — захват пакетов, анализ и поиск неисправностей.',
+    'int.label':'Также изучаю','int.heading':'Дополнительные интересы',
+    'int.note':'Помимо основной работы с серверами, мне интересны низкоуровневое программирование и творческие side-проекты.',
+    'int.c':'Программирование на C','int.gd':'Разработка игр',
+    'con.label':'Контакты',
+    'con.heading':'На<br>связи',
+    'con.desc':'Открыт к общению на темы Linux, инфраструктуры, сетей и всего, что связано с системами. Пишите.',
+    'con.open':'↗ открыть','con.copy':'копировать ↗','con.copied':'Email скопирован ✓','con.term':'На связи',
+    'foot.role':'Системный администратор','foot.built':'Создано с','foot.rights':'Все права защищены.'
+  }
+};
+
+var lang = localStorage.getItem('lang') || 'en';
+
+window.setLang = function(l){
+  lang = l;
+  localStorage.setItem('lang', l);
+  document.documentElement.lang = l;
+  applyAll();
+  updateBtns();
+};
+
+function tr(k){ return (T[lang] && T[lang][k]) || (T['en'][k]) || k; }
+
+function applyAll(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.textContent = tr(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    el.innerHTML = tr(el.dataset.i18nHtml);
+  });
+  // Terminal special elements
+  var tm = document.getElementById('term-msg');
+  var to = document.getElementById('term-out');
+  if(tm) tm.textContent = tr('con.term');
+  if(to) to.textContent = tr('con.term');
+  // copy action reset
+  var ca = document.getElementById('copy-action');
+  if(ca) ca.textContent = tr('con.copy');
+}
+
+function updateBtns(){
+  ['en','ru'].forEach(function(l){
+    var b1 = document.getElementById('btn-'+l);
+    var b2 = document.getElementById('btn-'+l+'-m');
+    if(b1){b1.classList.toggle('active', l===lang); b1.setAttribute('aria-pressed', l===lang);}
+    if(b2){b2.classList.toggle('active', l===lang); b2.setAttribute('aria-pressed', l===lang);}
+  });
+}
+
+// Init
+applyAll(); updateBtns();
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+/* ═══════════ REDUCED MOTION ═══════════ */
+var noAnim = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═══════════ SCROLL / NAV ═══════════ */
+var nav = document.getElementById('main-nav');
+var secs = document.querySelectorAll('section[id]');
+var navAs = document.querySelectorAll('.nav-links a[data-section]');
+
+window.addEventListener('scroll', function(){
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+  var cur = '';
+  secs.forEach(function(s){ if(s.getBoundingClientRect().top <= 100) cur = s.id; });
+  navAs.forEach(function(a){ a.classList.toggle('active', a.dataset.section === cur); });
+}, {passive:true});
+
+/* ═══════════ MOBILE MENU ═══════════ */
+var ham = document.getElementById('hamburger');
+var mob = document.getElementById('mobile-menu');
+var open = false;
+
+ham.addEventListener('click', toggle);
+function toggle(){
+  open = !open;
+  ham.classList.toggle('open', open);
+  mob.classList.toggle('open', open);
+  ham.setAttribute('aria-expanded', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+document.querySelectorAll('.mobile-link').forEach(function(a){
+  a.addEventListener('click', function(){ if(open) toggle(); });
+});
+
+/* ═══════════ SCROLL REVEAL ═══════════ */
+if(!noAnim){
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:.12,rootMargin:'0px 0px -48px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+} else {
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('visible'); });
+}
+
+/* ═══════════ COPY EMAIL ═══════════ */
+window.copyEmail = function(){
+  var email = 'eskamarket3@gmail.com';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(email).then(toast);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = email; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+};
+function toast(){
+  var t = document.getElementById('copy-toast');
+  var a = document.getElementById('copy-action');
+  t.textContent = tr('con.copied');
+  t.classList.add('show');
+  if(a) a.textContent = lang === 'ru' ? 'скопировано ✓' : 'copied ✓';
+  setTimeout(function(){
+    t.classList.remove('show');
+    if(a) a.textContent = tr('con.copy');
+  }, 2200);
+}
+
+/* ═══════════ CANVAS INFRA DIAGRAM ═══════════ */
+var canvas = document.getElementById('infra-canvas');
+var ctx = canvas.getContext('2d');
+
+function resize(){
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  var r = canvas.getBoundingClientRect();
+  canvas.width = r.width*dpr; canvas.height = r.height*dpr;
+  ctx.scale(dpr, dpr);
+}
+resize();
+
+var ND = [
+  {id:'router', label:'Router',   icon:'router', rx:.50,ry:.13,primary:true},
+  {id:'switch', label:'Switch',   icon:'switch', rx:.50,ry:.37,primary:false},
+  {id:'srv1',   label:'Web Srv',  icon:'server', rx:.20,ry:.60,primary:false},
+  {id:'srv2',   label:'SSH Srv',  icon:'server', rx:.50,ry:.65,primary:false},
+  {id:'srv3',   label:'File Srv', icon:'server', rx:.80,ry:.60,primary:false},
+  {id:'cl1',    label:'Client',   icon:'client', rx:.20,ry:.88,primary:false},
+  {id:'cl2',    label:'Client',   icon:'client', rx:.50,ry:.90,primary:false},
+  {id:'cl3',    label:'Monitor',  icon:'monitor',rx:.80,ry:.88,primary:false},
+];
+var ED = [
+  ['router','switch'],['switch','srv1'],['switch','srv2'],['switch','srv3'],
+  ['srv1','cl1'],['srv2','cl2'],['srv3','cl3']
+];
+
+var nodes = [], packets = [], hov = null, raf2;
+
+function build(){
+  var W = canvas.getBoundingClientRect().width;
+  var H = canvas.getBoundingClientRect().height;
+  nodes = ND.map(function(d){
+    return {id:d.id,label:d.label,icon:d.icon,primary:d.primary,
+            x:d.rx*W,y:d.ry*H,r:d.primary?28:22,ht:0,pt:Math.random()*Math.PI*2};
+  });
+}
+build();
+
+function spawn(){
+  var e = ED[Math.floor(Math.random()*ED.length)];
+  var a = nodes.find(function(n){return n.id===e[0];}), b = nodes.find(function(n){return n.id===e[1];});
+  if(!a||!b) return;
+  packets.push({sx:a.x,sy:a.y,ex:b.x,ey:b.y,t:0,sp:.004+Math.random()*.003});
+}
+
+function rr(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function icon(n){
+  var x=n.x,y=n.y,a=.3+n.ht*.5;
+  ctx.strokeStyle='rgba(127,171,110,'+a+')';
+  ctx.fillStyle='rgba(127,171,110,'+a+')';
+  ctx.lineWidth=1.5;ctx.lineCap='round';ctx.lineJoin='round';
+  if(n.icon==='server'){
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x-9,y-7,18,6,1):rr(x-9,y-7,18,6,1));ctx.stroke();
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x-9,y+1,18,6,1):rr(x-9,y+1,18,6,1));ctx.stroke();
+    ctx.beginPath();ctx.arc(x+6,y-4,1.2,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(x+6,y+4,1.2,0,Math.PI*2);ctx.fill();
+  } else if(n.icon==='router'){
+    ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x,y-11);ctx.lineTo(x,y-7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-10,y-8);ctx.lineTo(x-7,y-5);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x+10,y-8);ctx.lineTo(x+7,y-5);ctx.stroke();
+  } else if(n.icon==='switch'){
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x-10,y-4,20,8,2):rr(x-10,y-4,20,8,2));ctx.stroke();
+    [-5,0,5].forEach(function(dx){ctx.beginPath();ctx.moveTo(x+dx,y+4);ctx.lineTo(x+dx,y+8);ctx.stroke();});
+  } else if(n.icon==='client'){
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x-8,y-7,16,10,1):rr(x-8,y-7,16,10,1));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-5,y+3);ctx.lineTo(x-5,y+7);ctx.lineTo(x+5,y+7);ctx.lineTo(x+5,y+3);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-7,y+7);ctx.lineTo(x+7,y+7);ctx.stroke();
+  } else if(n.icon==='monitor'){
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x-9,y-7,18,12,1):rr(x-9,y-7,18,12,1));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x,y+5);ctx.lineTo(x,y+8);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-4,y+8);ctx.lineTo(x+4,y+8);ctx.stroke();
+  }
+}
+
+function lerp(a,b,t){return a+(b-a)*t;}
+
+var lt = 0;
+function draw(ts){
+  var W=canvas.getBoundingClientRect().width, H=canvas.getBoundingClientRect().height;
+  ctx.clearRect(0,0,W,H);
+  var dt=Math.min((ts-lt)/1000,.05); lt=ts;
+
+  ED.forEach(function(e){
+    var a=nodes.find(function(n){return n.id===e[0];}), b=nodes.find(function(n){return n.id===e[1];});
+    if(!a||!b) return;
+    var hv=a===hov||b===hov;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle=hv?'rgba(127,171,110,.35)':'rgba(255,255,255,.07)';
+    ctx.lineWidth=hv?1.5:1;ctx.stroke();
+  });
+
+  for(var i=packets.length-1;i>=0;i--){
+    var p=packets[i]; p.t+=p.sp;
+    if(p.t>=1){packets.splice(i,1);continue;}
+    var px=lerp(p.sx,p.ex,p.t), py=lerp(p.sy,p.ey,p.t);
+    ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(127,171,110,.6)';ctx.fill();
+    var tt=Math.max(0,p.t-.08);
+    ctx.beginPath();ctx.moveTo(lerp(p.sx,p.ex,tt),lerp(p.sy,p.ey,tt));ctx.lineTo(px,py);
+    ctx.strokeStyle='rgba(127,171,110,.2)';ctx.lineWidth=2;ctx.stroke();
+  }
+
+  nodes.forEach(function(n){
+    n.ht=lerp(n.ht,n===hov?1:0,.1); n.pt+=dt*1.2;
+    var x=n.x,y=n.y,r=n.r,ht=n.ht;
+    if(n.primary){
+      var pa=.15+.1*Math.sin(n.pt), pr=r+8+4*Math.sin(n.pt);
+      ctx.beginPath();ctx.arc(x,y,pr,0,Math.PI*2);
+      ctx.strokeStyle='rgba(127,171,110,'+pa+')';ctx.lineWidth=1;ctx.stroke();
+    }
+    if(ht>.01){
+      var g=ctx.createRadialGradient(x,y,r*.5,x,y,r*2.2);
+      g.addColorStop(0,'rgba(127,171,110,'+(0.18*ht)+')');g.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(x,y,r*2.2,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    }
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle='#161a1f';ctx.fill();
+    var ba=lerp(.09,.5,ht), bc=ht>.5?'127,171,110':'255,255,255';
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.strokeStyle='rgba('+bc+','+ba+')';ctx.lineWidth=n.primary?1.5:1;ctx.stroke();
+    if(n.primary){
+      ctx.beginPath();ctx.arc(x,y,r-4,0,Math.PI*2);
+      ctx.strokeStyle='rgba(127,171,110,'+(0.25+.15*ht)+')';ctx.lineWidth=1;ctx.stroke();
+    }
+    icon(n);
+    ctx.font="11px 'JetBrains Mono',monospace";
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(255,255,255,'+lerp(.35,.78,ht)+')';
+    ctx.fillText(n.label,x,y+r+13);
+  });
+  raf2=requestAnimationFrame(draw);
+}
+
+if(!noAnim){setInterval(spawn,900);raf2=requestAnimationFrame(draw);}
+else requestAnimationFrame(draw);
+
+function cpos(e){
+  var r=canvas.getBoundingClientRect();
+  var cx=e.touches?e.touches[0].clientX:e.clientX;
+  var cy=e.touches?e.touches[0].clientY:e.clientY;
+  return{x:cx-r.left,y:cy-r.top};
+}
+function findNode(mx,my){
+  for(var i=nodes.length-1;i>=0;i--){
+    var n=nodes[i],dx=mx-n.x,dy=my-n.y;
+    if(dx*dx+dy*dy<=(n.r+6)*(n.r+6)) return n;
+  }
+  return null;
+}
+canvas.addEventListener('mousemove',function(e){var p=cpos(e);hov=findNode(p.x,p.y);canvas.style.cursor=hov?'pointer':'default';});
+canvas.addEventListener('mouseleave',function(){hov=null;canvas.style.cursor='default';});
+
+var rt;
+window.addEventListener('resize',function(){
+  clearTimeout(rt);
+  rt=setTimeout(function(){
+    cancelAnimationFrame(raf2);resize();build();
+    if(!noAnim) raf2=requestAnimationFrame(draw);
+    else requestAnimationFrame(draw);
+  },120);
+});
+
+})();
+</script>
+</body>
+</html>
